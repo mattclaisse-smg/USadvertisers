@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Dashboard: Top US Advertisers</title>    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Modern Professional -->
+    <!-- Application Structure Plan: The application is designed as an interactive dashboard, a departure from the linear report structure. This architecture prioritizes user-driven exploration. The structure includes: 1) A header with key metrics for an immediate overview. 2) A control panel with filters (category, spend) and sorting options, empowering users to query the data. 3) A visualization section with dynamic bar and donut charts to reveal patterns and comparisons. 4) An interactive card-based list for detailed browsing. 5) A modal view for deep-dive analysis on individual advertisers. This non-linear, task-oriented structure was chosen to transform passive reading into active data discovery, making the complex dataset more accessible and insightful for strategic analysis. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Top advertisers' spending. Goal: Compare magnitudes. Viz: Bar Chart. Interaction: Filterable, hover tooltips. Justification: Best for direct comparison of values. Library: Chart.js (Canvas).
+        - Report Info: Spend distribution by category. Goal: Show proportions. Viz: Donut Chart. Interaction: Click to filter. Justification: Clearly shows composition of the whole. Library: Chart.js (Canvas).
+        - Report Info: Full advertiser list. Goal: Organize and explore. Viz: Interactive Card Grid. Interaction: Filter, sort, click for detail. Justification: Modern, scannable alternative to a static table. Method: HTML/CSS/JS.
+        - Report Info: Detailed company profiles. Goal: Provide in-depth information. Viz: Modal Window. Interaction: On-click display. Justification: Keeps main UI clean, provides details on demand. Method: HTML/CSS/JS.
+        - Report Info: Key report insights. Goal: Summarize findings. Viz: Themed Info Cards. Interaction: Static. Justification: Makes analytical text easily digestible. Method: HTML/CSS (Tailwind).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background-color: #FDFBF7;
+            color: #333333;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .modal-bg {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        .nav-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-btn.active {
+            background-color: #4A90E2;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .advertiser-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .advertiser-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
+
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Top US Advertisers</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An interactive analysis of leading non-grocery and non-tech advertisers, their investments, and market strategies.</p>
+        </header>
+
+        <nav class="flex justify-center space-x-2 mb-12">
+            <button data-section="dashboard" class="nav-btn active px-4 py-2 rounded-full font-semibold text-gray-700 bg-white border border-gray-200">📊 Dashboard</button>
+            <button data-section="insights" class="nav-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-white border border-gray-200">💡 Key Insights</button>
+            <button data-section="about" class="nav-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-white border border-gray-200">ℹ️ About</button>
+        </nav>
+
+        <main>
+            <section id="dashboard-section" class="space-y-12">
+                <div>
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800">Market Overview</h2>
+                        <p class="text-md text-gray-600 mt-1">Visualize spending trends and filter the data to uncover insights.</p>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
+                        <div class="lg:col-span-1">
+                            <h3 class="font-bold text-xl text-gray-700 mb-4">Controls</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="categoryFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Category</label>
+                                    <select id="categoryFilter" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <option value="all">All Categories</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="spendFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Ad Spend (in millions)</label>
+                                    <input type="range" id="spendFilter" class="w-full" min="0" max="7000" step="100" value="7000">
+                                    <div class="text-sm text-gray-600 text-right">Up to $<span id="spendValue">7000</span>M</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                                    <div class="flex space-x-2">
+                                        <button id="sortByRank" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-blue-500 text-white shadow">Rank</button>
+                                        <button id="sortBySpend" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700">Spend</button>
+                                        <button id="sortByName" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700">Name</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2">
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-gray-50 p-4 rounded-xl text-center">
+                                    <h4 class="text-sm font-semibold text-gray-500">Total Advertisers</h4>
+                                    <p id="totalAdvertisers" class="text-3xl font-bold text-blue-600">70</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-xl text-center">
+                                    <h4 class="text-sm font-semibold text-gray-500">Total Ad Spend</h4>
+                                    <p id="totalSpend" class="text-3xl font-bold text-blue-600">$0M</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-center text-gray-800 mb-1">Top 10 Spenders by Category</h3>
+                        <p class="text-center text-sm text-gray-500 mb-4">This chart shows the top 10 advertisers based on your current filter.</p>
+                        <div class="chart-container">
+                            <canvas id="spendersChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-center text-gray-800 mb-1">Ad Spend by Category</h3>
+                        <p class="text-center text-sm text-gray-500 mb-4">Click a segment to filter the list below.</p>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-gray-800">Advertiser Directory</h2>
+                        <p class="text-md text-gray-600 mt-1">Explore individual companies. Click on a card for a detailed profile.</p>
+                    </div>
+                    <div id="advertiserList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    </div>
+                </div>
+            </section>
+
+            <section id="insights-section" class="hidden space-y-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-gray-800">Strategic Insights & Market Implications</h2>
+                    <p class="text-md text-gray-600 mt-1 max-w-3xl mx-auto">This section summarizes the key strategic trends and audience engagement tactics observed from the report's data, providing a high-level analysis of the advertising landscape.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2 text-blue-600">Resilience of Traditional Sectors</h3>
+                        <p class="text-gray-600 text-sm">Despite the digital boom, sectors like telecom, automotive, and finance continue to invest heavily in broad-reach media, highlighting the enduring power of mass advertising for building brand trust and widespread awareness in mature industries.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2 text-blue-600">Shift to Performance Metrics</h3>
+                        <p class="text-gray-600 text-sm">There is a clear demand for tangible results. Advertisers are leveraging data-driven targeting and focusing on measurable ROI, pushing for greater transparency and efficiency in media buying and campaign execution.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2 text-blue-600">Integration of Brand Purpose</h3>
+                        <p class="text-gray-600 text-sm">Leading companies increasingly communicate their social responsibility and core values. In commoditized markets, intangible attributes like trust, reliability, and community impact are becoming critical differentiators to build emotional connections.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2 text-blue-600">Sophisticated Audience Targeting</h3>
+                        <p class="text-gray-600 text-sm">Targeting has evolved beyond simple demographics. Advertisers now use granular psychographic and behavioral data to create highly personalized and effective messaging that resonates with specific consumer lifestyles and values.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2 text-blue-600">Hybrid Agency Models</h3>
+                        <p class="text-gray-600 text-sm">A trend towards hybrid models that blend robust in-house teams with specialized external agencies is emerging. This reflects a desire for greater strategic control while still accessing cutting-edge, specialized creative and technological expertise.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2 text-blue-600">Multi-Channel Integration</h3>
+                        <p class="text-gray-600 text-sm">A mix of traditional (TV, print) and digital (streaming, social) channels is now standard practice. The goal is to create a seamless brand presence, reaching consumers across all touchpoints of their media consumption journey.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="about-section" class="hidden">
+                 <div class="text-center">
+                    <h2 class="text-3xl font-bold text-gray-800">About This Application</h2>
+                    <p class="text-md text-gray-600 mt-1 max-w-3xl mx-auto">Learn more about the data source and the purpose of this interactive tool.</p>
+                </div>
+                <div class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <div class="space-y-6 text-gray-700">
+                        <p>This interactive web application was created to provide an explorable and intuitive interface for the "Leading Non-Grocery and Non-Tech US Advertisers" market analysis report. The primary goal is to translate the dense, static data from the report into a dynamic experience that facilitates understanding and synthesis of key information.</p>
+                        <p>The application allows users to easily navigate, filter, and visualize the report's core data points, including annual ad spend, primary agency affiliations, and key target audiences for the top US advertisers of 2023.</p>
+                        <p><span class="font-semibold">Data Source:</span> The core data for advertiser rankings and 2023 US ad spending is derived from the <span class="font-semibold">"Ad Age Leading National Advertisers 2024"</span> report. This comprehensive list was then filtered to exclude companies primarily operating in the grocery retail or technology sectors, per the analysis requirements.</p>
+                        <p>By transforming the report into this dashboard, we aim to empower users—from marketing professionals to business strategists—to uncover trends, benchmark against competitors, and gain a deeper understanding of the US advertising landscape.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="advertiserModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+        <div id="modal-bg" class="modal-bg absolute inset-0 bg-black bg-opacity-50"></div>
+        <div id="modal-content" class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative transform scale-95">
+            <div class="p-6 md:p-8">
+                <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
+                <h2 id="modalName" class="text-2xl md:text-3xl font-bold text-gray-800"></h2>
+                <p id="modalCategory" class="text-md text-blue-600 font-semibold mt-1"></p>
+                <div class="my-4 border-t border-gray-200"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+                    <div>
+                        <p class="text-sm text-gray-500">2023 US Ad Spend</p>
+                        <p id="modalSpend" class="text-2xl font-bold text-gray-800"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Prominent Agency</p>
+                        <p id="modalAgency" class="text-lg font-semibold text-gray-700"></p>
+                    </div>
+                </div>
+                <div class="my-4 border-t border-gray-200"></div>
+                <div class="space-y-4 text-gray-600">
+                    <div>
+                        <h3 class="font-bold text-lg text-gray-800 mb-2">Key Target Audience</h3>
+                        <p id="modalAudience" class="text-sm leading-relaxed"></p>
+                        <button id="expandAudienceBtn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm font-semibold">
+                            ✨ Deep Dive Audience Insight
+                        </button>
+                        <div id="modalAudienceLoader" class="hidden text-center mt-2 text-gray-500">Generating insights...</div>
+                        <div id="modalExpandedAudience" class="mt-4 p-3 bg-gray-50 rounded-lg text-sm italic"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const advertiserData = [
+        { rank: 1, marketer: "Comcast Corp.", category: "Entertainment and media", spend: 6187.80, agency: "Comcast Advertising (in-house)", audience: "Broad audience across 60+ markets, 99M+ US adults, targeting by demographics, behaviors, psychographics, and content consumption across multiple screens." },
+        { rank: 2, marketer: "Procter & Gamble Co.", category: "Personal care", spend: 6143.85, agency: "PG One (Publicis Groupe)", audience: "Wide range of demographics (18-65+), various income levels (value to premium), and both women and men across household and personal care categories, globally." },
+        { rank: 3, marketer: "Walt Disney Co.", category: "Entertainment and media", spend: 4361.24, agency: "Internal Marketing Team", audience: "Broad and diverse, primarily families with young children (4-12) and nostalgic adults (25-45), also content-savvy teens, aiming for cross-generational appeal." },
+        { rank: 4, marketer: "General Motors Co.", category: "Automotive", spend: 4228.60, agency: "Stream Companies, Jack Morton", audience: "Diverse customers across brands (Chevrolet: mass-market; GMC: upscale; Buick: luxury/value; Cadillac: high-end luxury), including families, professionals, and tech-savvy individuals." },
+        { rank: 5, marketer: "Verizon Communications", category: "Telecommunications", spend: 3966.56, agency: "Internal Creative & Media Teams", audience: "Broad and segmented, from tech-savvy Gen Z to Baby Boomers (25-54, mid-to-high income), valuing reliability, security, and innovation; targets families and professionals." },
+        { rank: 6, marketer: "Capital One Financial Corp.", category: "Financial services", spend: 3828.60, agency: "DDB of Chicago", audience: "Individuals, small businesses, and large commercial enterprises; notably targets college students and young customers with minimal credit history for long-term relationships." },
+        { rank: 7, marketer: "JPMorgan Chase & Co.", category: "Financial services", spend: 3578.36, agency: "Various media properties", audience: "Mainly 22-70 age group, including young investors, older savers, businessmen, and enterprises; diverse social media strategy targets all age groups." },
+        { rank: 8, marketer: "Ford Motor Co.", category: "Automotive", spend: 3546.70, agency: "Wieden+Kennedy, GTB", audience: "Broad demographic (30-65, middle-to-upper-middle income), including blue-collar workers (trucks), suburban families (SUVs), and tech-savvy/eco-conscious drivers (EVs)." },
+        { rank: 9, marketer: "Pfizer", category: "Pharmaceuticals", spend: 3450.00, agency: "Grey New York", audience: "Healthcare professionals (doctors, pharmacists) and patients across therapeutic areas like cancer, HIV/AIDS, cardiovascular disease, and autoimmune conditions." },
+        { rank: 10, marketer: "LVMH", category: "Retail", spend: 2793.77, agency: "Various partners (e.g., Google)", audience: "High-income, style-conscious women (18-54, $75k+ salary), jet setters, trendsetters, and those seeking prominence and social status." },
+        { rank: 11, marketer: "Nestlé", category: "Food and beverages", spend: 2563.92, agency: "Internal teams, CheckMark", audience: "Diverse age groups (infants to seniors), global presence, health-conscious individuals, and pet owners; products cater to various income levels." },
+        { rank: 12, marketer: "Deutsche Telekom (T-Mobile US)", category: "Telecommunications", spend: 2500.00, agency: "Internal Ad Platform", audience: "Over 130M+ subscribers, 240M+ consumers 18+, aiming for broad 5G coverage across the US population." },
+        { rank: 13, marketer: "AT&T", category: "Telecommunications", spend: 2463.83, agency: "BBDO, Internal Ad Solutions", audience: "Primarily Gen Z (12-27) for current campaigns, individual consumers and businesses, with a focus on diverse communities." },
+        { rank: 14, marketer: "Expedia Group", category: "Travel", spend: 2411.29, agency: "Internal Media Solutions", audience: "Wide variety of customers: business travelers, vacationers (families, leisure/luxury), and those attending 'hot spots' (sporting events, Olympics)." },
+        { rank: 15, marketer: "Paramount Global", category: "Entertainment and media", spend: 2343.51, agency: "Internal marketing teams", audience: "Broad audiences across platforms worldwide, #1 in key US target demographics including total audience, kids, adults, African-Americans, and Hispanics." },
+        { rank: 16, marketer: "PepsiCo", category: "Food and beverages", spend: 2167.10, agency: "Internal marketing teams", audience: "Consumers aged 15-45 who enjoy carbonated drinks and snacks, particularly teenagers and young adults; also health-conscious consumers." },
+        { rank: 17, marketer: "Booking Holdings", category: "Travel", spend: 2141.01, agency: "Affiliate program", audience: "Global travelers seeking online travel and related services, consumers and local partners in 220+ countries." },
+        { rank: 18, marketer: "AbbVie", category: "Pharmaceuticals", spend: 1948.18, agency: "Various partners (e.g., Google)", audience: "Seriously ill patients worldwide across four therapeutic areas: general medicine, rare disease, inflammation, and oncology." },
+        { rank: 19, marketer: "Coca-Cola Co.", category: "Food and beverages", spend: 1812.20, agency: "Internal marketing teams", audience: "Young people (10-35), students, middle-class and low-income families; also diet-conscious middle-aged and older adults." },
+        { rank: 20, marketer: "Merck & Co.", category: "Pharmaceuticals", spend: 1694.82, agency: "Various partners (e.g., YouTube)", audience: "Healthcare professionals and patients globally, with a focus on developing medicines and vaccines to save and improve lives." },
+        { rank: 21, marketer: "Bank of America Corp.", category: "Financial services", spend: 1688.00, agency: "Internal advertising practices", audience: "Individual consumers, small and middle-market businesses, and large corporations, providing full range of banking, investing, and financial services." },
+        { rank: 22, marketer: "Nike", category: "Apparel and accessories", spend: 1668.00, agency: "Wieden+Kennedy", audience: "Diverse, primarily 15-45, with strong emphasis on Gen Z and Millennials; appeals to athletes, fitness enthusiasts, and casual wearers." },
+        { rank: 23, marketer: "Progressive Corp.", category: "Insurance", spend: 1640.00, agency: "Internal media contacts", audience: "Adults between 31 and 45 who are undergoing major life changes (marriage, family, home); also broad consumers seeking affordable auto insurance." },
+        { rank: 24, marketer: "Diageo", category: "Food and beverages", spend: 1542.45, agency: "Internal marketing teams", audience: "Consumers of alcoholic beverages globally, continuously evolving data tools to understand attitudes and motivations." },
+        { rank: 25, marketer: "Anheuser-Busch InBev", category: "Food and beverages", spend: 1531.00, agency: "draftLine (in-house)", audience: "Global beer market, dominating US with 40% share; community-based marketing strategies effective with broad customer base." },
+        { rank: 26, marketer: "Inspire Brands", category: "Food service", spend: 1500.00, agency: "Internal Centers of Excellence", audience: "Diverse range of consumers across its multi-brand portfolio (Arby's, Baskin-Robbins, Buffalo Wild Wings, Dunkin', etc.)." },
+        { rank: 27, marketer: "Macy's", category: "Retail", spend: 1498.00, agency: "Macy's Media Network (internal)", audience: "Diverse, from millennials to baby boomers, middle-class to affluent, both men and women; values convenience, quality, and variety." },
+        { rank: 28, marketer: "Berkshire Hathaway", category: "General conglomerate", spend: 1480.00, agency: "Various partners (e.g., Google)", audience: "Individuals and entities seeking reliable and consistent long-term returns rather than high-risk, high-reward opportunities." },
+        { rank: 29, marketer: "Bristol-Myers Squibb Co.", category: "Pharmaceuticals", spend: 1450.00, agency: "Internal marketing teams", audience: "Healthcare professionals and patients with cancer, HIV/AIDS, cardiovascular disease, diabetes, hepatitis, rheumatoid arthritis, and psychiatric disorders." },
+        { rank: 30, marketer: "Flutter Entertainment", category: "Gambling", spend: 1400.00, agency: "Internal technology workforce", audience: "Online sports betting and iGaming players across various states in the US and 100+ global markets, including FanDuel users." },
+        { rank: 31, marketer: "Discover Financial Services", category: "Financial services", spend: 1380.00, agency: "Grey New York", audience: "Younger customers, like college students, with minimal credit history; also broad consumers for credit cards, loans, and banking services." },
+        { rank: 32, marketer: "Honda Motor Co.", category: "Automotive", spend: 1370.00, agency: "Internal marketing teams", audience: "Diverse, encompassing younger drivers, families, and middle-income professionals; values innovation, functionality, and sustainability." },
+        { rank: 33, marketer: "Sanofi", category: "Pharmaceuticals", spend: 1350.00, agency: "Internal global media relations", audience: "Patients globally, focusing on improving lives through medicines and vaccines in areas of high unmet medical need." },
+        { rank: 34, marketer: "Home Depot", category: "Retail", spend: 1340.00, agency: "Orange Apron Media (internal)", audience: "Homeowners, DIY enthusiasts, and professional contractors (30-65, moderate-to-high income), prioritizing functionality, value, and convenience." },
+        { rank: 35, marketer: "State Farm Mutual Auto Insurance Co.", category: "Insurance", spend: 1330.00, agency: "Internal media contacts and marketing sponsorships", audience: "Auto and homeowners insurance customers in California and across the US; nearly 7.9 million policies and accounts served daily." },
+        { rank: 36, marketer: "Eli Lilly & Co.", category: "Pharmaceuticals", spend: 1310.00, agency: "Internal marketing teams", audience: "Patients with type 2 diabetes, heart disease, obesity, and Alzheimer's disease, among others." },
+        { rank: 37, marketer: "Estée Lauder Cos.", category: "Personal care", spend: 1290.00, agency: "Internal marketing teams", audience: "Style-conscious consumers globally, valuing high-quality skin care, makeup, fragrance, and hair care products; focuses on luxury and prestige brands." },
+        { rank: 38, marketer: "Nissan Motor Co.", category: "Automotive", spend: 1280.00, agency: "Internal US PR contacts and communications teams", audience: "Diverse, including women (involved in 60% of purchases), the elderly, and people with disabilities; aims for comfortable and easy-to-use vehicles." },
+        { rank: 39, marketer: "EchoStar Corp.", category: "Telecommunications", spend: 1270.00, agency: "Internal marketing team", audience: "Approximately 6 million US satellite television customers and 7 million Boost wireless customers; also targets underserved markets with 5G." },
+        { rank: 40, marketer: "Kohl's Corp.", category: "Retail", spend: 1260.00, agency: "Kohl's Media Network (internal)", audience: "Primarily older women (55-65+), also employees; shoppers interested in apparel, beauty, and home vendors." },
+        { rank: 41, marketer: "EssilorLuxottica", category: "Apparel and accessories", spend: 1250.00, agency: "Various partners including Google (programmatic)", audience: "Consumers seeking eyecare and eyewear, with a portfolio of proprietary and licensed brands covering a wide range of market segments." },
+        { rank: 42, marketer: "Haleon", category: "Personal care", spend: 1240.00, agency: "Internal marketing teams", audience: "Millions of consumers globally who trust brands like Sensodyne, Panadol, Advil, Centrum for better everyday health; families who rely on hygiene and health brands." },
+        { rank: 43, marketer: "Constellation Brands", category: "Food and beverages", spend: 1230.00, agency: "Various partners including Google (programmatic)", audience: "Consumers of beer, wine, and spirits, with a focus on high-end imported beer (Corona Extra, Modelo Especial) and exceptional wine brands." },
+        { rank: 44, marketer: "Lowe's Cos.", category: "Retail", spend: 1220.00, agency: "Lowe's One Roof Media Network (internal retail media network)", audience: "Home improvement enthusiasts, DIY customers, and professional contractors, seeking a full complement of products and services for the home." },
+        { rank: 45, marketer: "Colgate-Palmolive Co.", category: "Personal care", spend: 1210.00, agency: "Internal marketing teams", audience: "All people, their pets, and the planet; focuses on oral care, personal care, home care, and pet nutrition globally." },
+        { rank: 46, marketer: "GSK", category: "Pharmaceuticals", spend: 1200.00, agency: "Internal marketing teams, various third parties for interest-based advertising", audience: "Adults aged 18-49, active, health-conscious people; also healthcare professionals and patients for medicines and vaccines." },
+        { rank: 47, marketer: "Clorox Co.", category: "Personal care", spend: 1190.00, agency: "JCDecaux (digital ad space for OOH)", audience: "Modern parents (25-40) with dual income and on-the-go lifestyles; also a diverse audience of all ages, genders, and races for general cleaning products." },
+        { rank: 48, marketer: "Gap Inc.", category: "Apparel and accessories", spend: 1180.00, agency: "Various partners including Google (programmatic)", audience: "Diverse, including 17-25 year olds (Gap), 13-35 year olds (Old Navy), and affluent consumers (Banana Republic); caters to various demographics for apparel and accessories." },
+        { rank: 49, marketer: "Molson Coors Beverage Co.", category: "Food and beverages", spend: 1170.00, agency: "Internal marketing teams", audience: "Legal drinking-age consumers, with a traditional focus on mainstream beer brands, but facing changing tastes among younger consumers." },
+        { rank: 50, marketer: "Restaurant Brands International", category: "Food service", spend: 1160.00, agency: "Internal marketing teams", audience: "Guests, franchisees, and communities across its quick service restaurant brands (TIM HORTONS®, BURGER KING®, POPEYES®, and FIREHOUSE SUBS®)." },
+        { rank: 51, marketer: "Chewy", category: "Retail", spend: 1150.00, agency: "Internal PR team, affiliate program", audience: "Pet parents who regard their pets as family members, including Millennials; focuses on customer loyalty and human-centered approach." },
+        { rank: 52, marketer: "Reckitt", category: "Personal care", spend: 1140.00, agency: "Internal marketing teams", audience: "Millions of people globally who trust their Health and Hygiene consumer brands (Dettol, Lysol, Durex, Finish, Mucinex, etc.) to care for their families." },
+        { rank: 53, marketer: "Kraft Heinz Co.", category: "Food and beverages", spend: 1130.00, agency: "Internal public relations and corporate communications", audience: "Consumers and their families who seek products that spark joy, bring people together, and create memorable moments; aims to nurture body and soul." },
+        { rank: 54, marketer: "Allstate Corp.", category: "Insurance", spend: 1120.00, agency: "Internal advertising and sponsorship teams", audience: "Property and casualty insurance customers, as well as life, accident, and health insurance product buyers; primarily in economically well-developed cities." },
+        { rank: 55, marketer: "Adidas", category: "Apparel and accessories", spend: 1110.00, agency: "VITRO Agency", audience: "Consumers seeking sporting goods, primarily young consumers (14-29, Millennials and Gen Z) who are active and fashion-conscious; also athletes and sports enthusiasts." },
+        { rank: 56, marketer: "AstraZeneca", category: "Pharmaceuticals", spend: 1100.00, agency: "Internal marketing and information center", audience: "Patients with cancer or other chronic and rare diseases; also governments, health systems, patient groups, academia, and NGOs." },
+        { rank: 57, marketer: "Amgen", category: "Pharmaceuticals", spend: 1090.00, agency: "IPG Mediabrands", audience: "Seriously ill patients worldwide, focusing on four therapeutic areas: general medicine, rare disease, inflammation, and oncology." },
+        { rank: 58, marketer: "Church & Dwight Co.", category: "Personal care", spend: 1080.00, agency: "Internal marketing teams", audience: "Consumers of iconic household products; targets major interstates and population centers for easy delivery." },
+        { rank: 59, marketer: "BMW Group", category: "Automotive", spend: 1070.00, agency: "Internal marketing teams", audience: "Affluent individuals who value luxury, performance, and innovative design (median age ~50, high-income); also attracting younger buyers with sporty/innovative designs." },
+        { rank: 60, marketer: "Bayer", category: "Pharmaceuticals", spend: 1060.00, agency: "Bayer Public Relations", audience: "Healthcare professionals (doctors, nurses, pharmacists) who prescribe and recommend pharmaceutical products." },
+        { rank: 61, marketer: "Carnival Corp.", category: "Travel", spend: 1050.00, agency: "Internal media relations and brand websites", audience: "Primarily female audience (35-54) for Carnival Cruise Line, but aims to reach couples, single men, and families; those seeking amazing experiences and safety." },
+        { rank: 62, marketer: "Chick-fil-A", category: "Food service", spend: 1040.00, agency: "The Roost (internal in-house agency)", audience: "Primarily families and young adults (18-34), with a balanced gender distribution; customers who prefer quick-service dining without compromising quality." },
+        { rank: 63, marketer: "Ashley Furniture Industries", category: "Home furnishings", spend: 1030.00, agency: "AVB Marketing", audience: "Broad consumer base seeking affordable, stylish furniture; homeowners across North America, focusing on design, manufacturing, and distribution." },
+        { rank: 64, marketer: "Chanel", category: "Apparel and accessories",
