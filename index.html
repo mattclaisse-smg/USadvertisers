@@ -566,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let chatHistory = [];
         chatHistory.push({ role: "user", parts: [{ text: prompt }] });
         const payload = { contents: chatHistory };
-        const apiKey = curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent" \
+        const apiKey = "curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent" \
   -H 'Content-Type: application/json' \
   -H 'X-goog-api-key: GEMINI_API_KEY' \
   -X POST \
@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
       }
     ]
-  }'; 
+  }'"; 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         let retries = 0;
