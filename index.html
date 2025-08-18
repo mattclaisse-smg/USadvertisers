@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Modern Professional -->
+    <!-- Chosen Palette: H2 NA Content Strategy Theme (Dark background with vibrant accents) -->
     <!-- Application Structure Plan: The application is designed as an interactive dashboard, a departure from the linear report structure. This architecture prioritizes user-driven exploration. The structure includes: 1) A header with key metrics for an immediate overview. 2) A control panel with filters (category, spend) and sorting options, empowering users to query the data. 3) A visualization section with dynamic bar and donut charts to reveal patterns and comparisons. 4) An interactive card-based list for detailed browsing. 5) A modal view for deep-dive analysis on individual advertisers. This non-linear, task-oriented structure was chosen to transform passive reading into active data discovery, making the complex dataset more accessible and insightful for strategic analysis. -->
     <!-- Visualization & Content Choices: 
         - Report Info: Top advertisers' spending. Goal: Compare magnitudes. Viz: Bar Chart. Interaction: Filterable, hover tooltips. Justification: Best for direct comparison of values. Library: Chart.js (Canvas).
@@ -22,8 +22,8 @@
     <style>
         body {
             font-family: 'Instrument Sans', sans-serif;
-            background-color: #FDFBF7;
-            color: #333333;
+            background-color: #1A1A1A; /* Dark charcoal from document */
+            color: #FDFBF7; /* Off-white for text */
         }
         .chart-container {
             position: relative;
@@ -49,8 +49,8 @@
             transition: all 0.2s ease-in-out;
         }
         .nav-btn.active {
-            background-color: #4A90E2;
-            color: white;
+            background-color: #00C2A8; /* Teal accent from document */
+            color: #1A1A1A; /* Dark text on bright background */
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
         .advertiser-card {
@@ -67,57 +67,57 @@
     <div id="app" class="container mx-auto p-4 sm:p-6 lg:p-8">
 
         <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Top US Advertisers</h1>
-            <p class="text-lg text-gray-600 max-w-3xl mx-auto">An interactive analysis of leading non-grocery and non-tech advertisers, their investments, and market strategies.</p>
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-100 mb-2">Top US Advertisers</h1>
+            <p class="text-lg text-gray-300 max-w-3xl mx-auto">An interactive analysis of leading non-grocery and non-tech advertisers, their investments, and market strategies.</p>
         </header>
 
         <nav class="flex justify-center space-x-2 mb-12">
-            <button data-section="dashboard" class="nav-btn active px-4 py-2 rounded-full font-semibold text-gray-700 bg-white border border-gray-200">📊 Dashboard</button>
-            <button data-section="insights" class="nav-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-white border border-gray-200">💡 Key Insights</button>
-            <button data-section="about" class="nav-btn px-4 py-2 rounded-full font-semibold text-gray-700 bg-white border border-gray-200">ℹ️ About</button>
+            <button data-section="dashboard" class="nav-btn active px-4 py-2 rounded-full font-semibold text-gray-100 bg-gray-800 border border-gray-700">📊 Dashboard</button>
+            <button data-section="insights" class="nav-btn px-4 py-2 rounded-full font-semibold text-gray-100 bg-gray-800 border border-gray-700">💡 Key Insights</button>
+            <button data-section="about" class="nav-btn px-4 py-2 rounded-full font-semibold text-gray-100 bg-gray-800 border border-gray-700">ℹ️ About</button>
         </nav>
 
         <main>
             <section id="dashboard-section" class="space-y-12">
                 <div>
                     <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-800">Market Overview</h2>
-                        <p class="text-md text-gray-600 mt-1">Visualize spending trends and filter the data to uncover insights.</p>
+                        <h2 class="text-3xl font-bold text-gray-100">Market Overview</h2>
+                        <p class="text-md text-gray-300 mt-1">Visualize spending trends and filter the data to uncover insights.</p>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 bg-gray-800 rounded-2xl shadow-sm border border-gray-700">
                         <div class="lg:col-span-1">
-                            <h3 class="font-bold text-xl text-gray-700 mb-4">Controls</h3>
+                            <h3 class="font-bold text-xl text-gray-100 mb-4">Controls</h3>
                             <div class="space-y-6">
                                 <div>
-                                    <label for="categoryFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Category</label>
-                                    <select id="categoryFilter" class="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <label for="categoryFilter" class="block text-sm font-medium text-gray-300 mb-1">Filter by Category</label>
+                                    <select id="categoryFilter" class="w-full p-2 border border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 bg-gray-700 text-gray-100">
                                         <option value="all">All Categories</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="spendFilter" class="block text-sm font-medium text-gray-700 mb-1">Filter by Ad Spend (in millions)</label>
+                                    <label for="spendFilter" class="block text-sm font-medium text-gray-300 mb-1">Filter by Ad Spend (in millions)</label>
                                     <input type="range" id="spendFilter" class="w-full" min="0" max="7000" step="100" value="7000">
-                                    <div class="text-sm text-gray-600 text-right">Up to $<span id="spendValue">7000</span>M</div>
+                                    <div class="text-sm text-gray-300 text-right">Up to $<span id="spendValue">7000</span>M</div>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Sort By</label>
                                     <div class="flex space-x-2">
-                                        <button id="sortByRank" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-blue-500 text-white shadow">Rank</button>
-                                        <button id="sortBySpend" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700">Spend</button>
-                                        <button id="sortByName" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-gray-200 text-gray-700">Name</button>
+                                        <button id="sortByRank" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-teal-500 text-gray-900 shadow">Rank</button>
+                                        <button id="sortBySpend" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-gray-700 text-gray-100">Spend</button>
+                                        <button id="sortByName" class="sort-btn flex-1 py-2 px-3 text-sm font-semibold rounded-lg bg-gray-700 text-gray-100">Name</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="lg:col-span-2">
                              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="bg-gray-50 p-4 rounded-xl text-center">
-                                    <h4 class="text-sm font-semibold text-gray-500">Total Advertisers</h4>
-                                    <p id="totalAdvertisers" class="text-3xl font-bold text-blue-600">70</p>
+                                <div class="bg-gray-700 p-4 rounded-xl text-center">
+                                    <h4 class="text-sm font-semibold text-gray-300">Total Advertisers</h4>
+                                    <p id="totalAdvertisers" class="text-3xl font-bold text-teal-500">70</p>
                                 </div>
-                                <div class="bg-gray-50 p-4 rounded-xl text-center">
-                                    <h4 class="text-sm font-semibold text-gray-500">Total Ad Spend</h4>
-                                    <p id="totalSpend" class="text-3xl font-bold text-blue-600">$0M</p>
+                                <div class="bg-gray-700 p-4 rounded-xl text-center">
+                                    <h4 class="text-sm font-semibold text-gray-300">Total Ad Spend</h4>
+                                    <p id="totalSpend" class="text-3xl font-bold text-teal-500">$0M</p>
                                 </div>
                             </div>
                         </div>
@@ -125,16 +125,16 @@
                 </div>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                        <h3 class="text-xl font-bold text-center text-gray-800 mb-1">Top 10 Spenders by Category</h3>
-                        <p class="text-center text-sm text-gray-500 mb-4">This chart shows the top 10 advertisers based on your current filter.</p>
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-700">
+                        <h3 class="text-xl font-bold text-center text-gray-100 mb-1">Top 10 Spenders by Category</h3>
+                        <p class="text-center text-sm text-gray-300 mb-4">This chart shows the top 10 advertisers based on your current filter.</p>
                         <div class="chart-container">
                             <canvas id="spendersChart"></canvas>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                        <h3 class="text-xl font-bold text-center text-gray-800 mb-1">Ad Spend by Category</h3>
-                        <p class="text-center text-sm text-gray-500 mb-4">Click a segment to filter the list below.</p>
+                    <div class="bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-700">
+                        <h3 class="text-xl font-bold text-center text-gray-100 mb-1">Ad Spend by Category</h3>
+                        <p class="text-center text-sm text-gray-300 mb-4">Click a segment to filter the list below.</p>
                         <div class="chart-container">
                             <canvas id="categoryChart"></canvas>
                         </div>
@@ -143,8 +143,8 @@
 
                 <div>
                     <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-800">Advertiser Directory</h2>
-                        <p class="text-md text-gray-600 mt-1">Explore individual companies. Click on a card for a detailed profile.</p>
+                        <h2 class="text-3xl font-bold text-gray-100">Advertiser Directory</h2>
+                        <p class="text-md text-gray-300 mt-1">Explore individual companies. Click on a card for a detailed profile.</p>
                     </div>
                     <div id="advertiserList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     </div>
@@ -153,44 +153,44 @@
 
             <section id="insights-section" class="hidden space-y-8">
                 <div class="text-center">
-                    <h2 class="text-3xl font-bold text-gray-800">Strategic Insights & Market Implications</h2>
-                    <p class="text-md text-gray-600 mt-1 max-w-3xl mx-auto">This section summarizes the key strategic trends and audience engagement tactics observed from the report's data, providing a high-level analysis of the advertising landscape.</p>
+                    <h2 class="text-3xl font-bold text-gray-100">Strategic Insights & Market Implications</h2>
+                    <p class="text-md text-gray-300 mt-1 max-w-3xl mx-auto">This section summarizes the key strategic trends and audience engagement tactics observed from the report's data, providing a high-level analysis of the advertising landscape.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-lg mb-2 text-blue-600">Resilience of Traditional Sectors</h3>
-                        <p class="text-gray-600 text-sm">Despite the digital boom, sectors like telecom, automotive, and finance continue to invest heavily in broad-reach media, highlighting the enduring power of mass advertising for building brand trust and widespread awareness in mature industries.</p>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                        <h3 class="font-bold text-lg mb-2 text-teal-500">Resilience of Traditional Sectors</h3>
+                        <p class="text-gray-300 text-sm">Despite the digital boom, sectors like telecom, automotive, and finance continue to invest heavily in broad-reach media, highlighting the enduring power of mass advertising for building brand trust and widespread awareness in mature industries.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-lg mb-2 text-blue-600">Shift to Performance Metrics</h3>
-                        <p class="text-gray-600 text-sm">There is a clear demand for tangible results. Advertisers are leveraging data-driven targeting and focusing on measurable ROI, pushing for greater transparency and efficiency in media buying and campaign execution.</p>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                        <h3 class="font-bold text-lg mb-2 text-teal-500">Shift to Performance Metrics</h3>
+                        <p class="text-300 text-sm">There is a clear demand for tangible results. Advertisers are leveraging data-driven targeting and focusing on measurable ROI, pushing for greater transparency and efficiency in media buying and campaign execution.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-lg mb-2 text-blue-600">Integration of Brand Purpose</h3>
-                        <p class="text-gray-600 text-sm">Leading companies increasingly communicate their social responsibility and core values. In commoditized markets, intangible attributes like trust, reliability, and community impact are becoming critical differentiators to build emotional connections.</p>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                        <h3 class="font-bold text-lg mb-2 text-teal-500">Integration of Brand Purpose</h3>
+                        <p class="text-gray-300 text-sm">Leading companies increasingly communicate their social responsibility and core values. In commoditized markets, intangible attributes like trust, reliability, and community impact are becoming critical differentiators to build emotional connections.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-lg mb-2 text-blue-600">Sophisticated Audience Targeting</h3>
-                        <p class="text-gray-600 text-sm">Targeting has evolved beyond simple demographics. Advertisers now use granular psychographic and behavioral data to create highly personalized and effective messaging that resonates with specific consumer lifestyles and values.</p>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                        <h3 class="font-bold text-lg mb-2 text-teal-500">Sophisticated Audience Targeting</h3>
+                        <p class="text-gray-300 text-sm">Targeting has evolved beyond simple demographics. Advertisers now use granular psychographic and behavioral data to create highly personalized and effective messaging that resonates with specific consumer lifestyles and values.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-lg mb-2 text-blue-600">Hybrid Agency Models</h3>
-                        <p class="text-gray-600 text-sm">A trend towards hybrid models that blend robust in-house teams with specialized external agencies is emerging. This reflects a desire for greater strategic control while still accessing cutting-edge, specialized creative and technological expertise.</p>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                        <h3 class="font-bold text-lg mb-2 text-teal-500">Hybrid Agency Models</h3>
+                        <p class="text-gray-300 text-sm">A trend towards hybrid models that blend robust in-house teams with specialized external agencies is emerging. This reflects a desire for greater strategic control while still accessing cutting-edge, specialized creative and technological expertise.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="font-bold text-lg mb-2 text-blue-600">Multi-Channel Integration</h3>
-                        <p class="text-gray-600 text-sm">A mix of traditional (TV, print) and digital (streaming, social) channels is now standard practice. The goal is to create a seamless brand presence, reaching consumers across all touchpoints of their media consumption journey.</p>
+                    <div class="bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-700">
+                        <h3 class="font-bold text-lg mb-2 text-teal-500">Multi-Channel Integration</h3>
+                        <p class="text-gray-300 text-sm">A mix of traditional (TV, print) and digital (streaming, social) channels is now standard practice. The goal is to create a seamless brand presence, reaching consumers across all touchpoints of their media consumption journey.</p>
                     </div>
                 </div>
             </section>
             
             <section id="about-section" class="hidden">
                  <div class="text-center">
-                    <h2 class="text-3xl font-bold text-gray-800">About This Application</h2>
-                    <p class="text-md text-gray-600 mt-1 max-w-3xl mx-auto">Learn more about the data source and the purpose of this interactive tool.</p>
+                    <h2 class="text-3xl font-bold text-gray-100">About This Application</h2>
+                    <p class="text-md text-gray-300 mt-1 max-w-3xl mx-auto">Learn more about the data source and the purpose of this interactive tool.</p>
                 </div>
-                <div class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
-                    <div class="space-y-6 text-gray-700">
+                <div class="max-w-4xl mx-auto mt-8 bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-700">
+                    <div class="space-y-6 text-gray-300">
                         <p>This interactive web application was created to provide an explorable and intuitive interface for the "Leading Non-Grocery and Non-Tech US Advertisers" market analysis report. The primary goal is to translate the dense, static data from the report into a dynamic experience that facilitates understanding and synthesis of key information.</p>
                         <p>The application allows users to easily navigate, filter, and visualize the report's core data points, including annual ad spend, primary agency affiliations, and key target audiences for the top US advertisers of 2023.</p>
                         <p><span class="font-semibold">Data Source:</span> The core data for advertiser rankings and 2023 US ad spending is derived from the <span class="font-semibold">"Ad Age Leading National Advertisers 2024"</span> report. This comprehensive list was then filtered to exclude companies primarily operating in the grocery retail or technology sectors, per the analysis requirements.</p>
@@ -203,32 +203,32 @@
 
     <div id="advertiserModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
         <div id="modal-bg" class="modal-bg absolute inset-0 bg-black bg-opacity-50"></div>
-        <div id="modal-content" class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative transform scale-95">
+        <div id="modal-content" class="modal-content bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative transform scale-95">
             <div class="p-6 md:p-8">
-                <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800">&times;</button>
-                <h2 id="modalName" class="text-2xl md:text-3xl font-bold text-gray-800"></h2>
-                <p id="modalCategory" class="text-md text-blue-600 font-semibold mt-1"></p>
-                <div class="my-4 border-t border-gray-200"></div>
+                <button id="closeModal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-100">&times;</button>
+                <h2 id="modalName" class="text-2xl md:text-3xl font-bold text-gray-100"></h2>
+                <p id="modalCategory" class="text-md text-teal-500 font-semibold mt-1"></p>
+                <div class="my-4 border-t border-gray-700"></div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
                     <div>
-                        <p class="text-sm text-gray-500">2023 US Ad Spend</p>
-                        <p id="modalSpend" class="text-2xl font-bold text-gray-800"></p>
+                        <p class="text-sm text-gray-400">2023 US Ad Spend</p>
+                        <p id="modalSpend" class="text-2xl font-bold text-gray-100"></p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">Prominent Agency</p>
-                        <p id="modalAgency" class="text-lg font-semibold text-gray-700"></p>
+                        <p class="text-sm text-gray-400">Prominent Agency</p>
+                        <p id="modalAgency" class="text-lg font-semibold text-gray-100"></p>
                     </div>
                 </div>
-                <div class="my-4 border-t border-gray-200"></div>
-                <div class="space-y-4 text-gray-600">
+                <div class="my-4 border-t border-gray-700"></div>
+                <div class="space-y-4 text-gray-300">
                     <div>
-                        <h3 class="font-bold text-lg text-gray-800 mb-2">Key Target Audience</h3>
+                        <h3 class="font-bold text-lg text-gray-100 mb-2">Key Target Audience</h3>
                         <p id="modalAudience" class="text-sm leading-relaxed"></p>
-                        <button id="expandAudienceBtn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-sm font-semibold">
+                        <button id="expandAudienceBtn" class="mt-4 px-4 py-2 bg-teal-500 text-gray-900 rounded-lg hover:bg-teal-600 transition-colors duration-200 text-sm font-semibold">
                             ✨ Deep Dive Audience Insight
                         </button>
-                        <div id="modalAudienceLoader" class="hidden text-center mt-2 text-gray-500">Generating insights...</div>
-                        <div id="modalExpandedAudience" class="mt-4 p-3 bg-gray-50 rounded-lg text-sm italic"></div>
+                        <div id="modalAudienceLoader" class="hidden text-center mt-2 text-gray-400">Generating insights...</div>
+                        <div id="modalExpandedAudience" class="mt-4 p-3 bg-gray-700 rounded-lg text-sm italic text-gray-200"></div>
                     </div>
                 </div>
             </div>
@@ -354,19 +354,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderAdvertiserList(data) {
         advertiserList.innerHTML = '';
         if (data.length === 0) {
-            advertiserList.innerHTML = `<p class="col-span-full text-center text-gray-500">No advertisers match the current filters.</p>`;
+            advertiserList.innerHTML = `<p class="col-span-full text-center text-gray-400">No advertisers match the current filters.</p>`;
             return;
         }
         data.forEach(item => {
             const card = document.createElement('div');
-            card.className = 'advertiser-card bg-white p-4 rounded-xl shadow-sm border border-gray-200 cursor-pointer';
+            card.className = 'advertiser-card bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-700 cursor-pointer';
             card.innerHTML = `
                 <div class="flex items-center mb-2">
-                    <span class="text-sm font-bold bg-gray-200 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center mr-3">${item.rank}</span>
-                    <h3 class="font-bold text-md text-gray-800 flex-1 truncate">${item.marketer}</h3>
+                    <span class="text-sm font-bold bg-gray-700 text-gray-100 rounded-full w-8 h-8 flex items-center justify-center mr-3">${item.rank}</span>
+                    <h3 class="font-bold text-md text-gray-100 flex-1 truncate">${item.marketer}</h3>
                 </div>
-                <p class="text-xs text-blue-600 font-semibold mb-2">${item.category}</p>
-                <p class="text-xl font-bold text-gray-900">$${item.spend.toFixed(2)}M</p>
+                <p class="text-xs text-teal-500 font-semibold mb-2">${item.category}</p>
+                <p class="text-xl font-bold text-gray-100">$${item.spend.toFixed(2)}M</p>
             `;
             card.addEventListener('click', () => openModal(item));
             advertiserList.appendChild(card);
@@ -396,8 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     datasets: [{
                         label: 'US Ad Spend (in millions)',
                         data: values,
-                        backgroundColor: '#4A90E2',
-                        borderColor: '#357ABD',
+                        backgroundColor: '#00C2A8', /* Teal accent */
+                        borderColor: '#009985',
                         borderWidth: 1,
                         borderRadius: 4
                     }]
@@ -417,7 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     scales: {
                         x: {
                             beginAtZero: true,
-                            title: { display: true, text: 'Ad Spend ($M)' }
+                            title: { display: true, text: 'Ad Spend ($M)', color: '#FDFBF7' },
+                            ticks: { color: '#FDFBF7' },
+                            grid: { color: '#444444' }
                         },
                         y: {
                             ticks: {
@@ -425,8 +427,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 callback: function(value) {
                                     const label = this.getLabelForValue(value);
                                     return label.length > 20 ? label.substring(0, 20) + '...' : label;
-                                }
-                            }
+                                },
+                                color: '#FDFBF7'
+                            },
+                            grid: { color: '#444444' }
                         }
                     }
                 }
@@ -444,7 +448,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const labels = sortedCategories.map(d => d[0]);
         const values = sortedCategories.map(d => d[1]);
         
-        const backgroundColors = ['#4A90E2', '#F5A623', '#50E3C2', '#BD10E0', '#7ED321', '#9013FE', '#B8E986', '#417505', '#D0021B', '#F8E71C', '#8B572A', '#E94E77'];
+        const backgroundColors = [
+            '#F5C700', /* Yellow */
+            '#00C2A8', /* Teal */
+            '#B392F0', /* Lavender */
+            '#E94E77', /* Pink/Magenta */
+            '#00B0F0', /* Cyan */
+            '#FF8C00', /* Dark Orange */
+            '#8A2BE2', /* Blue Violet */
+            '#32CD32', /* Lime Green */
+            '#DC143C', /* Crimson */
+            '#FFD700', /* Gold */
+            '#DA70D6', /* Orchid */
+            '#4682B4'  /* Steel Blue */
+        ];
 
         if (categoryChart) {
             categoryChart.data.labels = labels;
@@ -467,18 +484,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } },
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                boxWidth: 12, 
+                                padding: 15,
+                                color: '#FDFBF7' /* Legend text color */
+                            } 
+                        },
                         tooltip: {
                             callbacks: {
                                 label: (context) => `${context.label}: $${context.raw.toFixed(2)}M`
                             }
-                        }
-                    },
-                    onClick: (evt, elements) => {
-                        if (elements.length > 0) {
-                            const clickedLabel = categoryChart.data.labels[elements[0].index];
-                            categoryFilter.value = clickedLabel;
-                            updateDashboard();
                         }
                     }
                 }
@@ -549,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let chatHistory = [];
         chatHistory.push({ role: "user", parts: [{ text: prompt }] });
         const payload = { contents: chatHistory };
-        const apiKey = curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent" \
+        const apiKey = "curl "AIzaSyCLBzlPdyFX9-TskiI_2lk6k2pPsKEnkBw"
   -H 'Content-Type: application/json' \
   -H 'X-goog-api-key: GEMINI_API_KEY' \
   -X POST \
@@ -563,8 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
       }
     ]
-  }'";
-        const apiUrl =`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+  }'"; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         let retries = 0;
         const maxRetries = 5;
@@ -626,11 +643,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.sort-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             document.querySelectorAll('.sort-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-500', 'text-white', 'shadow');
-                btn.classList.add('bg-gray-200', 'text-gray-700');
+                btn.classList.remove('bg-teal-500', 'text-gray-900', 'shadow');
+                btn.classList.add('bg-gray-700', 'text-gray-100');
             });
-            e.target.classList.add('bg-blue-500', 'text-white', 'shadow');
-            e.target.classList.remove('bg-gray-200', 'text-gray-700');
+            e.target.classList.add('bg-teal-500', 'text-gray-900', 'shadow');
+            e.target.classList.remove('bg-gray-700', 'text-gray-100');
             
             if (e.target.id === 'sortBySpend') currentSort = 'spend';
             else if (e.target.id === 'sortByName') currentSort = 'name';
